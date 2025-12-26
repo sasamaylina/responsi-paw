@@ -30,6 +30,7 @@ class Campaign(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
+    image = db.Column(db.String(255))  # Featured image filename
     target_amount = db.Column(db.Float, nullable=False)
     collected_amount = db.Column(db.Float, default=0)
     is_active = db.Column(db.Boolean, default=True)

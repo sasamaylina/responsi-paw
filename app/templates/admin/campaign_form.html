@@ -9,7 +9,7 @@
 </div>
 
 <div class="card" style="max-width: 600px;">
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
 
         <div class="form-group">
@@ -26,6 +26,21 @@
             {% for error in form.description.errors %}
             <div class="form-errors">{{ error }}</div>
             {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.image.label(class="form-label") }}
+            {{ form.image(class="form-control", accept="image/*") }}
+            {% for error in form.image.errors %}
+            <div class="form-errors">{{ error }}</div>
+            {% endfor %}
+            {% if is_edit and campaign and campaign.image %}
+            <div class="image-preview" style="margin-top: 0.5rem;">
+                <p style="font-size: 0.875rem; color: #666;">Gambar saat ini:</p>
+                <img src="{{ url_for('static', filename='uploads/' + campaign.image) }}" alt="Current image"
+                    style="max-width: 200px; border-radius: 8px; margin-top: 0.5rem;">
+            </div>
+            {% endif %}
         </div>
 
         <div class="form-group">

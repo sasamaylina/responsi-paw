@@ -26,6 +26,15 @@
 <div class="campaign-grid">
     {% for campaign in campaigns %}
     <div class="campaign-card">
+        {% if campaign.image %}
+        <div class="campaign-image">
+            <img src="{{ url_for('static', filename='uploads/' + campaign.image) }}" alt="{{ campaign.title }}">
+        </div>
+        {% else %}
+        <div class="campaign-image campaign-image-placeholder">
+            <span>🎯</span>
+        </div>
+        {% endif %}
         <div class="campaign-content">
             <h3 class="campaign-title">{{ campaign.title }}</h3>
             <p class="campaign-description">{{ campaign.description or 'Tidak ada deskripsi' }}</p>

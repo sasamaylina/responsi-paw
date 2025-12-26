@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, TextAreaField, FloatField, BooleanField, SelectField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, NumberRange
+from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, NumberRange, Optional
 from app.models import User
 
 
@@ -32,6 +33,9 @@ class RegisterForm(FlaskForm):
 class CampaignForm(FlaskForm):
     title = StringField('Judul Campaign', validators=[DataRequired(), Length(max=200)])
     description = TextAreaField('Deskripsi')
+    image = FileField('Featured Image', validators=[
+        FileAllowed(['jpg', 'jpeg', 'png', 'gif', 'webp'], 'Hanya file gambar yang diizinkan!')
+    ])
     target_amount = FloatField('Target Donasi (Rp)', validators=[DataRequired(), NumberRange(min=1)])
     is_active = BooleanField('Aktif')
     submit = SubmitField('Simpan')

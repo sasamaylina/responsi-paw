@@ -1,11 +1,46 @@
+import os
+import uuid
 from functools import wraps
-from flask import Blueprint, render_template, redirect, url_for, flash, abort, request
+from flask import Blueprint, render_template, redirect, url_for, flash, abort, request, current_app
 from flask_login import login_required, current_user
+from werkzeug.utils import secure_filename
 from app import db
 from app.models import User, Campaign, Donation
 from app.forms import CampaignForm, UserEditForm
 
 admin_bp = Blueprint('admin', __name__)
+
+
+def allowed_file(filename):
+    """Check if file extension is allowed"""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
+
+
+def save_image(file):
+    """Save uploaded image and return filename"""
+    if file and file.filename and allowed_file(file.filename):
+        # Generate unique filename
+        ext = file.filename.rsplit('.', 1)[1].lower()
+        filename = f"{uuid.uuid4().hex}.{ext}"
+        
+        # Ensure upload directory exists
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+        os.makedirs(upload_folder, exist_ok=True)
+        
+        # Save file
+        filepath = os.path.join(upload_folder, filename)
+        file.save(filepath)
+        return filename
+    return None
+
+
+def delete_image(filename):
+    """Delete image file if exists"""
+    if filename:
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(filepath):
+            os.remove(filepath)
 
 
 def admin_required(f):
@@ -54,9 +89,15 @@ def campaigns():
 def create_campaign():
     form = CampaignForm()
     if form.validate_on_submit():
+        # Handle image upload
+        image_filename = None
+        if form.image.data:
+            image_filename = save_image(form.image.data)
+        
         campaign = Campaign(
             title=form.title.data,
             description=form.description.data,
+            image=image_filename,
             target_amount=form.target_amount.data,
             is_active=form.is_active.data
         )
@@ -76,6 +117,13 @@ def edit_campaign(id):
     form = CampaignForm(obj=campaign)
     
     if form.validate_on_submit():
+        # Handle image upload
+        if form.image.data:
+            # Delete old image
+            delete_image(campaign.image)
+            # Save new image
+            campaign.image = save_image(form.image.data)
+        
         campaign.title = form.title.data
         campaign.description = form.description.data
         campaign.target_amount = form.target_amount.data
@@ -91,6 +139,8 @@ def edit_campaign(id):
 @admin_required
 def delete_campaign(id):
     campaign = Campaign.query.get_or_404(id)
+    # Delete image file
+    delete_image(campaign.image)
     db.session.delete(campaign)
     db.session.commit()
     flash('Campaign berhasil dihapus!', 'success')
