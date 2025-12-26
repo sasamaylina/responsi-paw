@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Sistem Donasi{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Dashboard Admin</h1>
+    <span class="badge badge-primary">{{ current_user.username }}</span>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ total_users }}</div>
+        <div class="stat-label">Total User</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_campaigns }}</div>
+        <div class="stat-label">Total Campaign</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_donations }}</div>
+        <div class="stat-label">Total Donasi</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">Rp {{ "{:,.0f}".format(total_collected) }}</div>
+        <div class="stat-label">Total Terkumpul</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Donasi Terbaru</h2>
+        </div>
+        {% if recent_donations %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Donor</th>
+                        <th>Campaign</th>
+                        <th>Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for donation in recent_donations %}
+                    <tr>
+                        <td>{{ donation.donor.username }}</td>
+                        <td>{{ donation.campaign.title[:20] }}...</td>
+                        <td>Rp {{ "{:,.0f}".format(donation.amount) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>Belum ada donasi</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Campaign Aktif</h2>
+        </div>
+        {% if active_campaigns %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Judul</th>
+                        <th>Progress</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campaign in active_campaigns %}
+                    <tr>
+                        <td>{{ campaign.title[:25] }}...</td>
+                        <td>
+                            <div class="progress" style="width: 100px;">
+                                <div class="progress-bar" style="width: {{ campaign.progress_percentage() }}%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>Belum ada campaign</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

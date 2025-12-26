@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistem Donasi - Platform donasi online terpercaya">
+    <title>{% block title %}Sistem Donasi{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="/" class="navbar-brand">💝 Sistem Donasi</a>
+            <ul class="navbar-nav">
+                {% if current_user.is_admin() %}
+                    <li><a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">Dashboard</a></li>
+                    <li><a href="{{ url_for('admin.campaigns') }}" class="{% if 'campaign' in request.endpoint %}active{% endif %}">Campaign</a></li>
+                    <li><a href="{{ url_for('admin.users') }}" class="{% if 'user' in request.endpoint %}active{% endif %}">Users</a></li>
+                    <li><a href="{{ url_for('admin.donations') }}" class="{% if request.endpoint == 'admin.donations' %}active{% endif %}">Donasi</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('donor.dashboard') }}" class="{% if request.endpoint == 'donor.dashboard' %}active{% endif %}">Dashboard</a></li>
+                    <li><a href="{{ url_for('donor.history') }}" class="{% if 'history' in request.endpoint or 'donation' in request.endpoint %}active{% endif %}">Riwayat Donasi</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 Sistem Donasi. Dibuat dengan ❤️ menggunakan Flask.</p>
+    </footer>
+</body>
+</html>

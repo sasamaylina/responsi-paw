@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Donor - Sistem Donasi{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Selamat Datang, {{ current_user.username }}! 👋</h1>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">Rp {{ "{:,.0f}".format(total_donated) }}</div>
+        <div class="stat-label">Total Donasi Anda</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ my_donations|length }}</div>
+        <div class="stat-label">Donasi Terakhir</div>
+    </div>
+</div>
+
+<div class="page-header" style="margin-top: 2rem;">
+    <h2 class="page-title">Campaign Aktif</h2>
+</div>
+
+{% if campaigns %}
+<div class="campaign-grid">
+    {% for campaign in campaigns %}
+    <div class="campaign-card">
+        <div class="campaign-content">
+            <h3 class="campaign-title">{{ campaign.title }}</h3>
+            <p class="campaign-description">{{ campaign.description or 'Tidak ada deskripsi' }}</p>
+
+            <div class="campaign-stats">
+                <span>Terkumpul</span>
+                <span class="campaign-amount">Rp {{ "{:,.0f}".format(campaign.collected_amount) }}</span>
+            </div>
+
+            <div class="progress" style="margin-bottom: 1rem;">
+                <div class="progress-bar" style="width: {{ campaign.progress_percentage() }}%;"></div>
+            </div>
+
+            <div class="campaign-stats">
+                <span>Target: Rp {{ "{:,.0f}".format(campaign.target_amount) }}</span>
+                <span>{{ "{:.0f}".format(campaign.progress_percentage()) }}%</span>
+            </div>
+
+            <a href="{{ url_for('donor.donate', campaign_id=campaign.id) }}" class="btn btn-primary btn-block"
+                style="margin-top: 1rem;">
+                Donasi Sekarang
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="empty-state">
+        <h3>Belum Ada Campaign Aktif</h3>
+        <p>Silakan tunggu campaign dari admin.</p>
+    </div>
+</div>
+{% endif %}
+
+{% if my_donations %}
+<div class="page-header" style="margin-top: 3rem;">
+    <h2 class="page-title">Donasi Terakhir Anda</h2>
+    <a href="{{ url_for('donor.history') }}" class="btn btn-secondary">Lihat Semua →</a>
+</div>
+
+<div class="card">
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Campaign</th>
+                    <th>Jumlah</th>
+                    <th>Tanggal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for donation in my_donations %}
+                <tr>
+                    <td>{{ donation.campaign.title }}</td>
+                    <td>Rp {{ "{:,.0f}".format(donation.amount) }}</td>
+                    <td>{{ donation.created_at.strftime('%d/%m/%Y') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

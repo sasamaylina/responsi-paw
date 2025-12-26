@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Riwayat Donasi - Sistem Donasi{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Riwayat Donasi Anda</h1>
+</div>
+
+<div class="card">
+    {% if donations %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Campaign</th>
+                    <th>Jumlah</th>
+                    <th>Pesan</th>
+                    <th>Tanggal</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for donation in donations %}
+                <tr>
+                    <td>{{ donation.id }}</td>
+                    <td>{{ donation.campaign.title[:30] }}{% if donation.campaign.title|length > 30 %}...{% endif %}
+                    </td>
+                    <td>Rp {{ "{:,.0f}".format(donation.amount) }}</td>
+                    <td>{{ donation.message[:30] if donation.message else '-' }}{% if donation.message and
+                        donation.message|length > 30 %}...{% endif %}</td>
+                    <td>{{ donation.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        <div class="actions">
+                            <a href="{{ url_for('donor.edit_donation', id=donation.id) }}"
+                                class="btn btn-secondary btn-sm">Edit</a>
+                            <form action="{{ url_for('donor.delete_donation', id=donation.id) }}" method="POST"
+                                style="display: inline;"
+                                onsubmit="return confirm('Yakin ingin menghapus donasi ini?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>Belum Ada Donasi</h3>
+        <p>Anda belum pernah berdonasi. Mari mulai berbagi kebaikan!</p>
+        <a href="{{ url_for('donor.dashboard') }}" class="btn btn-primary" style="margin-top: 1rem;">Lihat Campaign</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

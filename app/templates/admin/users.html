@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola User - Sistem Donasi{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Kelola User</h1>
+</div>
+
+<div class="card">
+    {% if users %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Tanggal Daftar</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        {% if user.role == 'admin' %}
+                        <span class="badge badge-primary">Admin</span>
+                        {% else %}
+                        <span class="badge badge-success">Donor</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        <div class="actions">
+                            <a href="{{ url_for('admin.edit_user', id=user.id) }}"
+                                class="btn btn-secondary btn-sm">Edit</a>
+                            {% if user.id != current_user.id %}
+                            <form action="{{ url_for('admin.delete_user', id=user.id) }}" method="POST"
+                                style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus user ini?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>Belum Ada User</h3>
+        <p>User akan muncul setelah ada yang mendaftar.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

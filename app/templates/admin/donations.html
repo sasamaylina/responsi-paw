@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Semua Donasi - Sistem Donasi{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Semua Donasi</h1>
+</div>
+
+<div class="card">
+    {% if donations %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Donor</th>
+                    <th>Campaign</th>
+                    <th>Jumlah</th>
+                    <th>Pesan</th>
+                    <th>Tanggal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for donation in donations %}
+                <tr>
+                    <td>{{ donation.id }}</td>
+                    <td>{{ donation.donor.username }}</td>
+                    <td>{{ donation.campaign.title[:30] }}{% if donation.campaign.title|length > 30 %}...{% endif %}
+                    </td>
+                    <td>Rp {{ "{:,.0f}".format(donation.amount) }}</td>
+                    <td>{{ donation.message[:50] if donation.message else '-' }}{% if donation.message and
+                        donation.message|length > 50 %}...{% endif %}</td>
+                    <td>{{ donation.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>Belum Ada Donasi</h3>
+        <p>Donasi akan muncul setelah ada yang berdonasi.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
